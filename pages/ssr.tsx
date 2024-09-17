@@ -1,7 +1,6 @@
-import ResponseModel from "@/pages/ResponseModel";
-import localFont from "next/font/local";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import localFont from "next/font/local";
+import ResponseModel from "@/pages/ResponseModel";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -14,32 +13,20 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export default function Home() {
+export async function getServerSideProps() {
+  const res = await fetch(`https://jsonplaceholder.typicode.com/posts/1`)
+  const data: ResponseModel = await res.json()
 
-  const [data, setData] = useState<ResponseModel | null>(null)
+  return { props: { data } }
+}
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch('https://jsonplaceholder.typicode.com/posts/1')
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const result = await response.json()
-      setData(result)
-    }
-
-    fetchData().catch((e) => {
-      // handle the error as needed
-      console.error('An error occurred while fetching the data: ', e)
-    })
-  }, [])
-
+export default function Home({ data } : {data: ResponseModel}) {
   return (
     <div
       className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
     >
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <p>{data ? `title: ${data.title}` : 'Loading...'}</p>
+        <p>`title: ${data.title}`</p>
         <Image
           className="dark:invert"
           src="https://nextjs.org/icons/next.svg"
